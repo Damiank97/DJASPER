@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DJASPER — The Sound Architect</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --black: #141420;
+      --deep: #1c1c2c;
+      --surface: #232336;
+      --border: #333350;
+      --neon: #00e8b8;
+      --neon2: #7b2fff;
+      --neon3: #ff2d6b;
+      --text: #f0f0f8;
+      --muted: #8888aa;
+      --font-display: 'Bebas Neue', sans-serif;
+      --font-mono: 'Space Mono', monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--text);
+      font-family: var(--font-mono);
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* Custom Cursor */
+    .cursor {
+      position: fixed;
+      width: 10px; height: 10px;
+      background: var(--neon);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: width 0.2s, height 0.2s, background 0.2s;
+      mix-blend-mode: difference;
+    }
+    .cursor-ring {
+      position: fixed;
+      width: 36px; height: 36px;
+      border: 1px solid var(--neon);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: all 0.1s ease;
+      opacity: 0.5;
+    }
+    body:hover .cursor { opacity: 1; }
+
+    /* Noise Overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.35;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 500;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 48px;
+      transition: background 0.4s, backdrop-filter 0.4s;
+    }
+    nav.scrolled {
+      background: rgba(20,20,32,0.88);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      letter-spacing: 0.1em;
+      color: var(--neon);
+      text-decoration: none;
+    }
+    .nav-links {
+      display: flex;
+      gap: 36px;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      transition: color 0.3s;
+    }
+    .nav-links a:hover { color: var(--neon); }
+    .nav-book {
+      background: transparent;
+      border: 1px solid var(--neon);
+      color: var(--neon);
+      padding: 10px 24px;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      cursor: none;
+      text-decoration: none;
+      transition: background 0.3s, color 0.3s;
+    }
+    .nav-book:hover {
+      background: var(--neon);
+      color: var(--black);
+    }
+
+    /* HERO */
+    #hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(123,47,255,0.18) 0%, transparent 65%),
+                  radial-gradient(ellipse 50% 40% at 80% 80%, rgba(0,245,196,0.1) 0%, transparent 60%),
+                  radial-gradient(ellipse 40% 30% at 20% 70%, rgba(255,45,107,0.08) 0%, transparent 50%),
+                  var(--black);
+    }
+
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,245,196,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,245,196,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 80%);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 0 24px;
+    }
+
+    .hero-tag {
+      display: inline-block;
+      font-size: 0.65rem;
+      letter-spacing: 0.4em;
+      color: var(--neon);
+      text-transform: uppercase;
+      border: 1px solid rgba(0,245,196,0.3);
+      padding: 6px 16px;
+      margin-bottom: 32px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.3s forwards;
+    }
+
+    .hero-name {
+      font-family: var(--font-display);
+      font-size: clamp(5rem, 16vw, 16rem);
+      line-height: 0.88;
+      letter-spacing: -0.02em;
+      color: transparent;
+      -webkit-text-stroke: 2px var(--neon);
+      text-shadow: 0 0 120px rgba(0,245,196,0.25);
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.5s forwards;
+    }
+
+    .hero-sub {
+      font-size: 0.75rem;
+      letter-spacing: 0.5em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-top: 24px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.7s forwards;
+    }
+
+    .hero-cta {
+      margin-top: 52px;
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.9s forwards;
+    }
+
+    .btn-primary {
+      background: var(--neon);
+      color: var(--black);
+      border: none;
+      padding: 16px 40px;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: none;
+      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
+      transition: background 0.3s, transform 0.2s;
+    }
+    .btn-primary:hover { background: #00e0b0; transform: translateY(-2px); }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 16px 40px;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: none;
+      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
+      transition: border-color 0.3s, transform 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--neon); transform: translateY(-2px); }
+
+    /* Vinyl record */
+    .vinyl-wrap {
+      position: absolute;
+      right: -80px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 520px;
+      height: 520px;
+      opacity: 0;
+      animation: fadeIn 1.2s ease 1s forwards;
+    }
+    .vinyl {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 50% 50%, #222 0%, #111 25%, #0a0a0a 27%, #1a1a1a 28%, #0a0a0a 30%,
+          #222 35%, #111 38%, #0d0d0d 40%, #222 42%, #111 45%,
+          #1a1a1a 50%, #0d0d0d 52%, #222 55%, #111 60%,
+          #0a0a0a 65%, #222 70%, #111 75%, #050505 80%,
+          #222 85%, #111 90%, #050505 100%);
+      animation: spin 8s linear infinite;
+      box-shadow:
+        0 0 0 2px rgba(0,245,196,0.1),
+        0 0 80px rgba(123,47,255,0.2),
+        0 30px 100px rgba(0,0,0,0.8);
+      position: relative;
+    }
+    .vinyl::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 22%;
+      height: 22%;
+      border-radius: 50%;
+      background: radial-gradient(circle, #1a1a2e 0%, #0d0d1a 100%);
+      border: 2px solid rgba(0,245,196,0.4);
+      box-shadow: 0 0 20px rgba(0,245,196,0.2);
+    }
+    .vinyl-label {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+      font-family: var(--font-display);
+      font-size: 0.9rem;
+      letter-spacing: 0.2em;
+      color: var(--neon);
+      pointer-events: none;
+    }
+
+    /* Scrolling ticker */
+    .ticker {
+      position: relative;
+      background: var(--neon);
+      padding: 14px 0;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .ticker-inner {
+      display: inline-flex;
+      animation: ticker 30s linear infinite;
+    }
+    .ticker-item {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      letter-spacing: 0.15em;
+      color: var(--black);
+      padding: 0 48px;
+    }
+    .ticker-sep {
+      color: rgba(0,0,0,0.3);
+    }
+
+    /* SECTION COMMON */
+    section {
+      padding: 120px 48px;
+    }
+    .section-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.5em;
+      color: var(--neon);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(3rem, 8vw, 7rem);
+      line-height: 0.9;
+      margin-bottom: 48px;
+    }
+
+    /* ABOUT */
+    #about {
+      background: var(--deep);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    .about-visual {
+      position: relative;
+    }
+    .about-img-frame {
+      width: 100%;
+      aspect-ratio: 3/4;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+      clip-path: polygon(0 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 24px 100%, 0 calc(100% - 24px));
+    }
+    .about-img-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 8rem;
+      color: rgba(0,245,196,0.05);
+      letter-spacing: -0.05em;
+      background:
+        radial-gradient(ellipse 60% 60% at 50% 30%, rgba(123,47,255,0.15) 0%, transparent 70%),
+        var(--surface);
+    }
+
+    /* Replace with actual photo by adding: <img src="photo.jpg"> in .about-img-frame */
+
+    .about-corner {
+      position: absolute;
+      bottom: -20px; right: -20px;
+      width: 100px; height: 100px;
+      border: 1px solid var(--neon);
+      opacity: 0.4;
+    }
+    .about-stat-row {
+      display: flex;
+      gap: 40px;
+      margin-top: 48px;
+    }
+    .about-stat {
+      flex: 1;
+    }
+    .stat-num {
+      font-family: var(--font-display);
+      font-size: 3rem;
+      color: var(--neon);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-top: 6px;
+    }
+    .about-text p {
+      color: var(--muted);
+      line-height: 1.8;
+      font-size: 0.85rem;
+      margin-bottom: 20px;
+    }
+    .about-text p strong { color: var(--text); }
+
+    /* GENRES */
+    .genre-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 32px;
+    }
+    .genre-tag {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 8px 18px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      transition: border-color 0.3s, color 0.3s;
+    }
+    .genre-tag:hover {
+      border-color: var(--neon);
+      color: var(--neon);
+    }
+
+    /* MIXES */
+    #mixes {
+      background: var(--black);
+    }
+    .mixes-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      margin-top: 0;
+    }
+    .mix-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 32px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.3s;
+      cursor: none;
+    }
+    .mix-card:hover { border-color: var(--neon); }
+    .mix-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(0,245,196,0.04) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .mix-card:hover::before { opacity: 1; }
+
+    .mix-num {
+      font-family: var(--font-display);
+      font-size: 4rem;
+      color: var(--border);
+      line-height: 1;
+      margin-bottom: 16px;
+    }
+    .mix-title {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+    .mix-meta {
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .waveform {
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      height: 40px;
+      margin-bottom: 20px;
+    }
+    .waveform-bar {
+      flex: 1;
+      background: var(--border);
+      border-radius: 1px;
+      transition: background 0.3s;
+      animation: wavePulse var(--dur, 1s) ease-in-out infinite alternate;
+      animation-delay: var(--delay, 0s);
+    }
+    .mix-card:hover .waveform-bar { background: var(--neon); }
+
+    .mix-play {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      color: var(--neon);
+      text-transform: uppercase;
+    }
+    .play-icon {
+      width: 32px; height: 32px;
+      border: 1px solid var(--neon);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.6rem;
+    }
+
+    /* EVENTS */
+    #events {
+      background: var(--deep);
+    }
+    .events-list {
+      margin-top: 0;
+    }
+    .event-row {
+      display: grid;
+      grid-template-columns: 120px 1fr auto auto;
+      align-items: center;
+      gap: 32px;
+      padding: 28px 32px;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.3s;
+      cursor: none;
+    }
+    .event-row:first-child { border-top: 1px solid var(--border); }
+    .event-row:hover { background: rgba(0,245,196,0.03); }
+    .event-row:hover .event-name { color: var(--neon); }
+
+    .event-date {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      color: var(--neon);
+      line-height: 1;
+    }
+    .event-date-sub {
+      font-size: 0.55rem;
+      letter-spacing: 0.3em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    .event-name {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      letter-spacing: 0.05em;
+      transition: color 0.3s;
+    }
+    .event-venue {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+    .event-city {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      text-transform: uppercase;
+      text-align: right;
+    }
+    .event-status {
+      font-size: 0.55rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border: 1px solid;
+    }
+    .status-soon { border-color: var(--neon3); color: var(--neon3); }
+    .status-avail { border-color: var(--neon); color: var(--neon); }
+    .status-sold { border-color: var(--muted); color: var(--muted); }
+
+    /* BOOKING */
+    #booking {
+      background: var(--black);
+      text-align: center;
+      padding: 160px 48px;
+      position: relative;
+      overflow: hidden;
+    }
+    #booking::before {
+      content: 'BOOK';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: var(--font-display);
+      font-size: 40vw;
+      color: rgba(255,255,255,0.025);
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .booking-content {
+      position: relative;
+      z-index: 2;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .booking-title {
+      font-family: var(--font-display);
+      font-size: clamp(4rem, 12vw, 11rem);
+      line-height: 0.88;
+      margin-bottom: 32px;
+    }
+    .booking-title em {
+      font-style: normal;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(0,232,184,0.7);
+    }
+    .booking-sub {
+      color: var(--muted);
+      font-size: 0.8rem;
+      line-height: 1.8;
+      margin-bottom: 48px;
+    }
+    .booking-socials {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+      margin-top: 64px;
+    }
+    .social-link {
+      width: 48px; height: 48px;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      transition: border-color 0.3s, color 0.3s;
+    }
+    .social-link:hover {
+      border-color: var(--neon);
+      color: var(--neon);
+    }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(10,10,18,0.85);
+      backdrop-filter: blur(12px);
+      z-index: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+      padding: 24px;
+    }
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .modal {
+      background: var(--deep);
+      border: 1px solid var(--border);
+      width: 100%;
+      max-width: 560px;
+      padding: 48px;
+      position: relative;
+      clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+      transform: translateY(30px);
+      transition: transform 0.35s ease;
+    }
+    .modal-overlay.open .modal {
+      transform: translateY(0);
+    }
+    .modal-close {
+      position: absolute;
+      top: 20px; right: 20px;
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      width: 36px; height: 36px;
+      font-size: 1rem;
+      cursor: none;
+      display: flex; align-items: center; justify-content: center;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .modal-close:hover { border-color: var(--neon3); color: var(--neon3); }
+
+    .modal-label {
+      font-size: 0.55rem;
+      letter-spacing: 0.5em;
+      color: var(--neon);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .modal-title {
+      font-family: var(--font-display);
+      font-size: 2.8rem;
+      letter-spacing: 0.05em;
+      margin-bottom: 32px;
+      line-height: 1;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.55rem;
+      letter-spacing: 0.35em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      padding: 13px 16px;
+      outline: none;
+      transition: border-color 0.3s;
+      appearance: none;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--neon);
+    }
+    .form-group textarea { resize: vertical; min-height: 100px; }
+    .form-group select option { background: var(--surface); }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .form-submit {
+      width: 100%;
+      background: var(--neon);
+      color: var(--black);
+      border: none;
+      padding: 16px;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      cursor: none;
+      margin-top: 8px;
+      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
+      transition: background 0.3s, transform 0.15s;
+    }
+    .form-submit:hover { background: #00d4a8; transform: translateY(-2px); }
+
+    .form-success {
+      display: none;
+      text-align: center;
+      padding: 32px 0;
+    }
+    .form-success .success-icon {
+      font-size: 3rem;
+      margin-bottom: 16px;
+    }
+    .form-success h3 {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      margin-bottom: 12px;
+      color: var(--neon);
+    }
+    .form-success p {
+      color: var(--muted);
+      font-size: 0.75rem;
+      line-height: 1.7;
+    }
+
+    /* FOOTER */
+    footer {
+      background: var(--deep);
+      border-top: 1px solid var(--border);
+      padding: 32px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    .footer-logo {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      letter-spacing: 0.1em;
+      color: var(--neon);
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+    @keyframes wavePulse {
+      from { transform: scaleY(0.3); }
+      to   { transform: scaleY(1); }
+    }
+
+    /* Scroll reveal */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      #about { grid-template-columns: 1fr; }
+      .about-visual { display: none; }
+      .mixes-grid { grid-template-columns: 1fr 1fr; }
+      .vinyl-wrap { display: none; }
+    }
+    @media (max-width: 768px) {
+      nav { padding: 20px 24px; }
+      .nav-links { display: none; }
+      section { padding: 80px 24px; }
+      .mixes-grid { grid-template-columns: 1fr; }
+      .event-row { grid-template-columns: 80px 1fr; }
+      .event-city, .event-status { display: none; }
+      footer { flex-direction: column; gap: 16px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Custom Cursor -->
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- NAV -->
+  <nav id="nav">
+    <a href="#hero" class="nav-logo">DJASPER</a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#mixes">Mixes</a></li>
+      <li><a href="#events">Events</a></li>
+      <li><a href="#booking">Contact</a></li>
+    </ul>
+    <a href="mailto:booking@djasper.nl" class="nav-book">Book Now</a>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+
+    <div class="hero-content">
+      <div class="hero-tag">&#9632; Live — Amsterdam · Ibiza · Berlin</div>
+      <h1 class="hero-name">DJASPER</h1>
+      <p class="hero-sub">The Sound Architect &nbsp;·&nbsp; Techno &nbsp;·&nbsp; House &nbsp;·&nbsp; Electronic</p>
+      <div class="hero-cta">
+        <a href="#mixes" class="btn-primary">Listen Now</a>
+        <a href="#booking" class="btn-secondary">Book for Events</a>
+      </div>
+    </div>
+
+    <div class="vinyl-wrap">
+      <div class="vinyl"></div>
+    </div>
+  </section>
+
+  <!-- TICKER -->
+  <div class="ticker">
+    <div class="ticker-inner" id="tickerInner">
+      <span class="ticker-item">DJASPER <span class="ticker-sep">✦</span></span>
+      <span class="ticker-item">THE SOUND ARCHITECT <span class="ticker-sep">✦</span></span>
+      <span class="ticker-item">AMSTERDAM <span class="ticker-sep">✦</span></span>
+      <span class="ticker-item">TECHNO · HOUSE · ELECTRONIC <span class="ticker-sep">✦</span></span>
+      <span class="ticker-item">AVAILABLE FOR BOOKINGS <span class="ticker-sep">✦</span></span>
+      <span class="ticker-item">DJASPER <span class="ticker-sep">✦</span></span>
+      <span class="ticker-item">THE SOUND ARCHITECT <span class="ticker-sep">✦</span></span>
+      <span class="ticker-item">AMSTERDAM <span class="ticker-sep">✦</span></span>
+      <span class="ticker-item">TECHNO · HOUSE · ELECTRONIC <span class="ticker-sep">✦</span></span>
+      <span class="ticker-item">AVAILABLE FOR BOOKINGS <span class="ticker-sep">✦</span></span>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="about-visual">
+      <div class="about-img-frame">
+        <div class="about-img-placeholder">DJ</div>
+        <!-- Swap this div for: <img src="djasper-photo.jpg" style="width:100%;height:100%;object-fit:cover;"> -->
+      </div>
+      <div class="about-corner"></div>
+    </div>
+    <div class="about-text reveal">
+      <p class="section-label">// About</p>
+      <h2 class="section-title">Sound.<br>Story.<br>Energy.</h2>
+      <p>DJASPER is een <strong>Nederlandse DJ en producent</strong> die zijn publiek meeneemt op een sonische reis door techno, deep house en elektronische muziek. Met een scherp gevoel voor energie en timing weet hij elk podium te electrificeren.</p>
+      <p>Van intieme club-sets tot grote festivals — DJASPER levert altijd een <strong>onvergetelijke ervaring</strong>. Zijn sets zijn zorgvuldig opgebouwd, zijn energie is onuitputtelijk.</p>
+
+      <div class="genre-tags">
+        <span class="genre-tag">Techno</span>
+        <span class="genre-tag">Deep House</span>
+        <span class="genre-tag">Melodic</span>
+        <span class="genre-tag">Afro House</span>
+        <span class="genre-tag">Industrial</span>
+        <span class="genre-tag">Electronic</span>
+      </div>
+
+      <div class="about-stat-row">
+        <div class="about-stat">
+          <div class="stat-num">200+</div>
+          <div class="stat-label">Shows per jaar</div>
+        </div>
+        <div class="about-stat">
+          <div class="stat-num">12</div>
+          <div class="stat-label">Landen</div>
+        </div>
+        <div class="about-stat">
+          <div class="stat-num">8</div>
+          <div class="stat-label">Jaar actief</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MIXES -->
+  <section id="mixes">
+    <div class="reveal">
+      <p class="section-label">// Latest Mixes</p>
+      <h2 class="section-title">Tune In.</h2>
+    </div>
+    <div class="mixes-grid">
+
+      <div class="mix-card reveal">
+        <div class="mix-num">01</div>
+        <div class="mix-title">DARK MATTER</div>
+        <div class="mix-meta">Techno · 90 min · 2025</div>
+        <div class="waveform" id="waveform1"></div>
+        <div class="mix-play">
+          <div class="play-icon">▶</div>
+          <span>Play on SoundCloud</span>
+        </div>
+      </div>
+
+      <div class="mix-card reveal" style="transition-delay:0.1s">
+        <div class="mix-num">02</div>
+        <div class="mix-title">SOLAR WINDS</div>
+        <div class="mix-meta">Melodic House · 75 min · 2025</div>
+        <div class="waveform" id="waveform2"></div>
+        <div class="mix-play">
+          <div class="play-icon">▶</div>
+          <span>Play on Mixcloud</span>
+        </div>
+      </div>
+
+      <div class="mix-card reveal" style="transition-delay:0.2s">
+        <div class="mix-num">03</div>
+        <div class="mix-title">AMSTERDAM LIVE</div>
+        <div class="mix-meta">Live Set · 120 min · 2024</div>
+        <div class="waveform" id="waveform3"></div>
+        <div class="mix-play">
+          <div class="play-icon">▶</div>
+          <span>Play on YouTube</span>
+        </div>
+      </div>
+
+      <div class="mix-card reveal" style="transition-delay:0.3s">
+        <div class="mix-num">04</div>
+        <div class="mix-title">NIGHT RITUAL</div>
+        <div class="mix-meta">Afro House · 60 min · 2024</div>
+        <div class="waveform" id="waveform4"></div>
+        <div class="mix-play">
+          <div class="play-icon">▶</div>
+          <span>Play on SoundCloud</span>
+        </div>
+      </div>
+
+      <div class="mix-card reveal" style="transition-delay:0.4s">
+        <div class="mix-num">05</div>
+        <div class="mix-title">IBIZA CLOSING</div>
+        <div class="mix-meta">Deep House · 110 min · 2024</div>
+        <div class="waveform" id="waveform5"></div>
+        <div class="mix-play">
+          <div class="play-icon">▶</div>
+          <span>Play on Mixcloud</span>
+        </div>
+      </div>
+
+      <div class="mix-card reveal" style="transition-delay:0.5s">
+        <div class="mix-num">06</div>
+        <div class="mix-title">DEBUT EP</div>
+        <div class="mix-meta">Studio · 42 min · 2023</div>
+        <div class="waveform" id="waveform6"></div>
+        <div class="mix-play">
+          <div class="play-icon">▶</div>
+          <span>Play on Spotify</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- EVENTS -->
+  <section id="events">
+    <div class="reveal">
+      <p class="section-label">// Upcoming Events</p>
+      <h2 class="section-title">On The Road.</h2>
+    </div>
+    <div class="events-list reveal">
+
+      <div class="event-row">
+        <div>
+          <div class="event-date">28</div>
+          <div class="event-date-sub">Mrt 2026</div>
+        </div>
+        <div>
+          <div class="event-name">SHELTER AMSTERDAM</div>
+          <div class="event-venue">Main Stage · B2B Set</div>
+        </div>
+        <div class="event-city">Amsterdam, NL</div>
+        <div class="event-status status-soon">Bijna Uitverkocht</div>
+      </div>
+
+      <div class="event-row">
+        <div>
+          <div class="event-date">12</div>
+          <div class="event-date-sub">Apr 2026</div>
+        </div>
+        <div>
+          <div class="event-name">AWAKENINGS FESTIVAL</div>
+          <div class="event-venue">Stage B · 04:00 – 06:00</div>
+        </div>
+        <div class="event-city">Amsterdam, NL</div>
+        <div class="event-status status-avail">Tickets Beschikbaar</div>
+      </div>
+
+      <div class="event-row">
+        <div>
+          <div class="event-date">03</div>
+          <div class="event-date-sub">Mei 2026</div>
+        </div>
+        <div>
+          <div class="event-name">DC-10 IBIZA</div>
+          <div class="event-venue">Closing Party · TBA</div>
+        </div>
+        <div class="event-city">Ibiza, ES</div>
+        <div class="event-status status-avail">Tickets Beschikbaar</div>
+      </div>
+
+      <div class="event-row">
+        <div>
+          <div class="event-date">21</div>
+          <div class="event-date-sub">Jun 2026</div>
+        </div>
+        <div>
+          <div class="event-name">TRESOR BERLIN</div>
+          <div class="event-venue">Globus · 02:00 – 06:00</div>
+        </div>
+        <div class="event-city">Berlin, DE</div>
+        <div class="event-status status-avail">Tickets Beschikbaar</div>
+      </div>
+
+      <div class="event-row">
+        <div>
+          <div class="event-date">19</div>
+          <div class="event-date-sub">Jul 2026</div>
+        </div>
+        <div>
+          <div class="event-name">DEKMANTEL FESTIVAL</div>
+          <div class="event-venue">UFO Stage</div>
+        </div>
+        <div class="event-city">Amsterdam, NL</div>
+        <div class="event-status status-avail">Tickets Beschikbaar</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- BOOKING -->
+  <section id="booking">
+    <div class="booking-content reveal">
+      <p class="section-label">// Booking</p>
+      <h2 class="booking-title">Let's<br><em>Make</em><br>Noise.</h2>
+      <p class="booking-sub">
+        Voor bookings, samenwerkingen of meer informatie —<br>
+        vul het formulier in en we reageren binnen 48 uur.
+      </p>
+      <button class="btn-primary" onclick="openModal()" style="font-size:0.75rem;padding:18px 48px;">
+        Stuur een Bericht
+      </button>
+
+      <div class="booking-socials">
+        <a href="#" class="social-link" title="Instagram">IG</a>
+        <a href="#" class="social-link" title="SoundCloud">SC</a>
+        <a href="#" class="social-link" title="Mixcloud">MC</a>
+        <a href="#" class="social-link" title="Spotify">SP</a>
+        <a href="#" class="social-link" title="YouTube">YT</a>
+        <a href="#" class="social-link" title="Facebook">FB</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT MODAL -->
+  <div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
+    <div class="modal" id="modal">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+
+      <div id="formWrap">
+        <p class="modal-label">// Booking Request</p>
+        <h2 class="modal-title">LATEN WE<br>PRATEN.</h2>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="f-name">Naam</label>
+            <input type="text" id="f-name" placeholder="Jouw naam" />
+          </div>
+          <div class="form-group">
+            <label for="f-email">E-mail</label>
+            <input type="email" id="f-email" placeholder="jouw@email.nl" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="f-type">Type Event</label>
+            <select id="f-type">
+              <option value="">Selecteer type...</option>
+              <option>Club Night</option>
+              <option>Festival</option>
+              <option>Privé Feest</option>
+              <option>Corporate Event</option>
+              <option>B2B Set</option>
+              <option>Anders</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="f-date">Datum</label>
+            <input type="date" id="f-date" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="f-venue">Venue / Locatie</label>
+          <input type="text" id="f-venue" placeholder="Naam venue + stad" />
+        </div>
+
+        <div class="form-group">
+          <label for="f-msg">Bericht</label>
+          <textarea id="f-msg" placeholder="Vertel meer over jouw event, verwacht publiek, tijdslot..."></textarea>
+        </div>
+
+        <button class="form-submit" onclick="submitForm()">Verstuur Aanvraag →</button>
+      </div>
+
+      <div class="form-success" id="formSuccess">
+        <div class="success-icon">✦</div>
+        <h3>Ontvangen!</h3>
+        <p>Bedankt voor je bericht.<br>DJASPER of zijn management neemt binnen 48 uur contact met je op.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">DJASPER</div>
+    <div>© 2026 DJASPER — All Rights Reserved</div>
+    <div>Made with ♦ in Amsterdam</div>
+  </footer>
+
+  <script>
+    // Cursor
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+    function animCursor() {
+      cursor.style.left = mx + 'px';
+      cursor.style.top = my + 'px';
+      rx += (mx - rx) * 0.12;
+      ry += (my - ry) * 0.12;
+      ring.style.left = rx + 'px';
+      ring.style.top = ry + 'px';
+      requestAnimationFrame(animCursor);
+    }
+    animCursor();
+    document.querySelectorAll('a, button').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        cursor.style.width = '18px';
+        cursor.style.height = '18px';
+        ring.style.width = '54px';
+        ring.style.height = '54px';
+      });
+      el.addEventListener('mouseleave', () => {
+        cursor.style.width = '10px';
+        cursor.style.height = '10px';
+        ring.style.width = '36px';
+        ring.style.height = '36px';
+      });
+    });
+
+    // Scroll nav
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 60);
+    });
+
+    // Waveforms
+    function makeWaveform(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const count = 28;
+      for (let i = 0; i < count; i++) {
+        const bar = document.createElement('div');
+        bar.className = 'waveform-bar';
+        const h = Math.random() * 70 + 20;
+        bar.style.height = h + '%';
+        bar.style.setProperty('--dur', (0.6 + Math.random() * 0.8) + 's');
+        bar.style.setProperty('--delay', (Math.random() * 0.5) + 's');
+        el.appendChild(bar);
+      }
+    }
+    for (let i = 1; i <= 6; i++) makeWaveform('waveform' + i);
+
+    // Modal
+    function openModal() {
+      document.getElementById('modalOverlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    function handleOverlayClick(e) {
+      if (e.target === document.getElementById('modalOverlay')) closeModal();
+    }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+    function submitForm() {
+      const name = document.getElementById('f-name').value.trim();
+      const email = document.getElementById('f-email').value.trim();
+      if (!name || !email) {
+        document.getElementById('f-name').style.borderColor = name ? 'var(--border)' : 'var(--neon3)';
+        document.getElementById('f-email').style.borderColor = email ? 'var(--border)' : 'var(--neon3)';
+        return;
+      }
+      document.getElementById('formWrap').style.display = 'none';
+      document.getElementById('formSuccess').style.display = 'block';
+      setTimeout(closeModal, 3200);
+    }
+
+    // Also open modal from nav "Book Now"
+    document.querySelector('.nav-book').addEventListener('click', e => {
+      e.preventDefault(); openModal();
+    });
+    const reveals = document.querySelectorAll('.reveal');
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          obs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    reveals.forEach(r => obs.observe(r));
+  </script>
+</body>
+</html>
