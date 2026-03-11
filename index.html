@@ -3,1290 +3,394 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DJASPER — The Sound Architect</title>
+  <title>DJASPER — Hardstyle Producer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --black: #141420;
-      --deep: #1c1c2c;
-      --surface: #232336;
-      --border: #333350;
-      --neon: #00e8b8;
-      --neon2: #7b2fff;
-      --neon3: #ff2d6b;
-      --text: #f0f0f8;
-      --muted: #8888aa;
-      --font-display: 'Bebas Neue', sans-serif;
-      --font-mono: 'Space Mono', monospace;
+      --bg:      #1a1a2e;
+      --deep:    #222240;
+      --surface: #2a2a4a;
+      --card:    #30305a;
+      --border:  #44447a;
+      --accent:  #ff6b35;
+      --accent2: #c850ff;
+      --teal:    #00d4aa;
+      --text:    #f4f4ff;
+      --sub:     #a0a0cc;
+      --muted:   #6666a0;
+      --display: 'Bebas Neue', sans-serif;
+      --body:    'DM Sans', sans-serif;
+      --mono:    'Space Mono', monospace;
     }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{background:var(--bg);color:var(--text);font-family:var(--body);overflow-x:hidden;cursor:none;}
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      background: var(--black);
-      color: var(--text);
-      font-family: var(--font-mono);
-      overflow-x: hidden;
-      cursor: none;
-    }
-
-    /* Custom Cursor */
-    .cursor {
-      position: fixed;
-      width: 10px; height: 10px;
-      background: var(--neon);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 9999;
-      transform: translate(-50%, -50%);
-      transition: width 0.2s, height 0.2s, background 0.2s;
-      mix-blend-mode: difference;
-    }
-    .cursor-ring {
-      position: fixed;
-      width: 36px; height: 36px;
-      border: 1px solid var(--neon);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 9998;
-      transform: translate(-50%, -50%);
-      transition: all 0.1s ease;
-      opacity: 0.5;
-    }
-    body:hover .cursor { opacity: 1; }
-
-    /* Noise Overlay */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 1000;
-      opacity: 0.35;
-    }
+    /* CURSOR */
+    #cur{position:fixed;width:8px;height:8px;background:var(--accent);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .15s,height .15s;}
+    #curR{position:fixed;width:32px;height:32px;border:1.5px solid var(--accent);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .15s,height .15s;opacity:.5;}
 
     /* NAV */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 500;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 24px 48px;
-      transition: background 0.4s, backdrop-filter 0.4s;
-    }
-    nav.scrolled {
-      background: rgba(20,20,32,0.88);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border);
-    }
-    .nav-logo {
-      font-family: var(--font-display);
-      font-size: 2rem;
-      letter-spacing: 0.1em;
-      color: var(--neon);
-      text-decoration: none;
-    }
-    .nav-links {
-      display: flex;
-      gap: 36px;
-      list-style: none;
-    }
-    .nav-links a {
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 0.7rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      transition: color 0.3s;
-    }
-    .nav-links a:hover { color: var(--neon); }
-    .nav-book {
-      background: transparent;
-      border: 1px solid var(--neon);
-      color: var(--neon);
-      padding: 10px 24px;
-      font-family: var(--font-mono);
-      font-size: 0.65rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      cursor: none;
-      text-decoration: none;
-      transition: background 0.3s, color 0.3s;
-    }
-    .nav-book:hover {
-      background: var(--neon);
-      color: var(--black);
-    }
+    nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;align-items:center;justify-content:space-between;padding:22px 56px;transition:background .4s;}
+    nav.scrolled{background:rgba(26,26,46,.92);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);}
+    .nav-logo{font-family:var(--display);font-size:2rem;letter-spacing:.12em;color:var(--accent);text-decoration:none;}
+    .nav-links{display:flex;gap:36px;list-style:none;}
+    .nav-links a{color:var(--sub);text-decoration:none;font-size:.78rem;font-weight:500;letter-spacing:.06em;transition:color .25s;}
+    .nav-links a:hover{color:var(--text);}
+    .nav-cta{background:var(--accent);color:#fff;border:none;padding:10px 26px;font-family:var(--mono);font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;cursor:none;text-decoration:none;font-weight:700;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%);transition:background .25s,transform .2s;}
+    .nav-cta:hover{background:#e85c28;transform:translateY(-1px);}
 
     /* HERO */
-    #hero {
-      position: relative;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
+    #hero{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+    .hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 55% at 50% -10%,rgba(255,107,53,.22) 0%,transparent 60%),radial-gradient(ellipse 50% 40% at 85% 75%,rgba(200,80,255,.15) 0%,transparent 60%),radial-gradient(ellipse 40% 35% at 10% 80%,rgba(0,212,170,.1) 0%,transparent 55%),var(--bg);}
+    .hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,107,53,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,107,53,.05) 1px,transparent 1px);background-size:72px 72px;mask-image:radial-gradient(ellipse 75% 75% at 50% 50%,black 25%,transparent 75%);}
+    .orb{position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none;opacity:.18;}
+    .orb1{width:500px;height:500px;background:var(--accent);top:-120px;left:-160px;animation:drift1 12s ease-in-out infinite;}
+    .orb2{width:400px;height:400px;background:var(--accent2);bottom:-80px;right:-100px;animation:drift2 10s ease-in-out infinite;}
+    .orb3{width:280px;height:280px;background:var(--teal);bottom:30%;right:22%;animation:drift1 14s ease-in-out infinite reverse;}
+    @keyframes drift1{0%,100%{transform:translate(0,0)}50%{transform:translate(28px,-18px)}}
+    @keyframes drift2{0%,100%{transform:translate(0,0)}50%{transform:translate(-18px,28px)}}
 
-    .hero-bg {
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(123,47,255,0.18) 0%, transparent 65%),
-                  radial-gradient(ellipse 50% 40% at 80% 80%, rgba(0,245,196,0.1) 0%, transparent 60%),
-                  radial-gradient(ellipse 40% 30% at 20% 70%, rgba(255,45,107,0.08) 0%, transparent 50%),
-                  var(--black);
-    }
+    .hero-content{position:relative;z-index:2;text-align:center;padding:0 24px;}
+    .hero-badge{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.6rem;letter-spacing:.35em;color:var(--accent);text-transform:uppercase;background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.3);padding:7px 18px;border-radius:2px;margin-bottom:36px;opacity:0;animation:up .7s ease .2s forwards;}
+    .bdot{width:6px;height:6px;background:var(--accent);border-radius:50%;animation:blink 1.5s ease infinite;}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+    .hero-name{font-family:var(--display);font-size:clamp(6rem,18vw,17rem);line-height:.85;letter-spacing:-.01em;background:linear-gradient(135deg,#ffffff 30%,#ff9a6c 70%,#ff6b35 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;opacity:0;animation:up .8s ease .4s forwards;}
+    .hero-sub{font-family:var(--mono);font-size:.72rem;letter-spacing:.45em;color:var(--sub);text-transform:uppercase;margin-top:20px;opacity:0;animation:up .7s ease .6s forwards;}
+    .hero-cta{margin-top:52px;display:flex;gap:16px;justify-content:center;opacity:0;animation:up .7s ease .8s forwards;}
+    .btn-fill{background:var(--accent);color:#fff;border:none;padding:15px 40px;font-family:var(--mono);font-size:.65rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;cursor:none;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%);transition:background .25s,transform .2s;}
+    .btn-fill:hover{background:#e85c28;transform:translateY(-2px);}
+    .btn-outline{background:transparent;color:var(--text);border:1.5px solid var(--border);padding:15px 40px;font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;cursor:none;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%);transition:border-color .25s,transform .2s;}
+    .btn-outline:hover{border-color:var(--accent);transform:translateY(-2px);}
 
-    .hero-grid {
-      position: absolute;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(0,245,196,0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,245,196,0.04) 1px, transparent 1px);
-      background-size: 60px 60px;
-      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 80%);
-    }
+    /* TICKER */
+    .ticker{background:var(--accent);padding:13px 0;overflow:hidden;white-space:nowrap;}
+    .ticker-track{display:inline-flex;animation:tick 28s linear infinite;}
+    .ticker-item{font-family:var(--display);font-size:1.1rem;letter-spacing:.12em;color:#fff;padding:0 44px;}
+    .tsep{opacity:.5;}
+    @keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
-    .hero-content {
-      position: relative;
-      z-index: 2;
-      text-align: center;
-      padding: 0 24px;
-    }
-
-    .hero-tag {
-      display: inline-block;
-      font-size: 0.65rem;
-      letter-spacing: 0.4em;
-      color: var(--neon);
-      text-transform: uppercase;
-      border: 1px solid rgba(0,245,196,0.3);
-      padding: 6px 16px;
-      margin-bottom: 32px;
-      opacity: 0;
-      animation: fadeUp 0.8s ease 0.3s forwards;
-    }
-
-    .hero-name {
-      font-family: var(--font-display);
-      font-size: clamp(5rem, 16vw, 16rem);
-      line-height: 0.88;
-      letter-spacing: -0.02em;
-      color: transparent;
-      -webkit-text-stroke: 2px var(--neon);
-      text-shadow: 0 0 120px rgba(0,245,196,0.25);
-      opacity: 0;
-      animation: fadeUp 0.8s ease 0.5s forwards;
-    }
-
-    .hero-sub {
-      font-size: 0.75rem;
-      letter-spacing: 0.5em;
-      color: var(--muted);
-      text-transform: uppercase;
-      margin-top: 24px;
-      opacity: 0;
-      animation: fadeUp 0.8s ease 0.7s forwards;
-    }
-
-    .hero-cta {
-      margin-top: 52px;
-      display: flex;
-      gap: 20px;
-      justify-content: center;
-      opacity: 0;
-      animation: fadeUp 0.8s ease 0.9s forwards;
-    }
-
-    .btn-primary {
-      background: var(--neon);
-      color: var(--black);
-      border: none;
-      padding: 16px 40px;
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
-      font-weight: 700;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      text-decoration: none;
-      cursor: none;
-      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
-      transition: background 0.3s, transform 0.2s;
-    }
-    .btn-primary:hover { background: #00e0b0; transform: translateY(-2px); }
-
-    .btn-secondary {
-      background: transparent;
-      color: var(--text);
-      border: 1px solid var(--border);
-      padding: 16px 40px;
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      text-decoration: none;
-      cursor: none;
-      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
-      transition: border-color 0.3s, transform 0.2s;
-    }
-    .btn-secondary:hover { border-color: var(--neon); transform: translateY(-2px); }
-
-    /* Vinyl record */
-    .vinyl-wrap {
-      position: absolute;
-      right: -80px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 520px;
-      height: 520px;
-      opacity: 0;
-      animation: fadeIn 1.2s ease 1s forwards;
-    }
-    .vinyl {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      background:
-        radial-gradient(circle at 50% 50%, #222 0%, #111 25%, #0a0a0a 27%, #1a1a1a 28%, #0a0a0a 30%,
-          #222 35%, #111 38%, #0d0d0d 40%, #222 42%, #111 45%,
-          #1a1a1a 50%, #0d0d0d 52%, #222 55%, #111 60%,
-          #0a0a0a 65%, #222 70%, #111 75%, #050505 80%,
-          #222 85%, #111 90%, #050505 100%);
-      animation: spin 8s linear infinite;
-      box-shadow:
-        0 0 0 2px rgba(0,245,196,0.1),
-        0 0 80px rgba(123,47,255,0.2),
-        0 30px 100px rgba(0,0,0,0.8);
-      position: relative;
-    }
-    .vinyl::after {
-      content: '';
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      width: 22%;
-      height: 22%;
-      border-radius: 50%;
-      background: radial-gradient(circle, #1a1a2e 0%, #0d0d1a 100%);
-      border: 2px solid rgba(0,245,196,0.4);
-      box-shadow: 0 0 20px rgba(0,245,196,0.2);
-    }
-    .vinyl-label {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 2;
-      font-family: var(--font-display);
-      font-size: 0.9rem;
-      letter-spacing: 0.2em;
-      color: var(--neon);
-      pointer-events: none;
-    }
-
-    /* Scrolling ticker */
-    .ticker {
-      position: relative;
-      background: var(--neon);
-      padding: 14px 0;
-      overflow: hidden;
-      white-space: nowrap;
-    }
-    .ticker-inner {
-      display: inline-flex;
-      animation: ticker 30s linear infinite;
-    }
-    .ticker-item {
-      font-family: var(--font-display);
-      font-size: 1.2rem;
-      letter-spacing: 0.15em;
-      color: var(--black);
-      padding: 0 48px;
-    }
-    .ticker-sep {
-      color: rgba(0,0,0,0.3);
-    }
-
-    /* SECTION COMMON */
-    section {
-      padding: 120px 48px;
-    }
-    .section-label {
-      font-size: 0.6rem;
-      letter-spacing: 0.5em;
-      color: var(--neon);
-      text-transform: uppercase;
-      margin-bottom: 16px;
-    }
-    .section-title {
-      font-family: var(--font-display);
-      font-size: clamp(3rem, 8vw, 7rem);
-      line-height: 0.9;
-      margin-bottom: 48px;
-    }
+    /* SECTIONS */
+    .section{padding:120px 56px;}
+    .sec-label{font-family:var(--mono);font-size:.55rem;letter-spacing:.5em;color:var(--accent);text-transform:uppercase;margin-bottom:14px;}
+    .sec-title{font-family:var(--display);font-size:clamp(3rem,7vw,6.5rem);line-height:.92;}
 
     /* ABOUT */
-    #about {
-      background: var(--deep);
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 80px;
-      align-items: center;
-    }
-
-    .about-visual {
-      position: relative;
-    }
-    .about-img-frame {
-      width: 100%;
-      aspect-ratio: 3/4;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      position: relative;
-      overflow: hidden;
-      clip-path: polygon(0 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 24px 100%, 0 calc(100% - 24px));
-    }
-    .about-img-placeholder {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: var(--font-display);
-      font-size: 8rem;
-      color: rgba(0,245,196,0.05);
-      letter-spacing: -0.05em;
-      background:
-        radial-gradient(ellipse 60% 60% at 50% 30%, rgba(123,47,255,0.15) 0%, transparent 70%),
-        var(--surface);
-    }
-
-    /* Replace with actual photo by adding: <img src="photo.jpg"> in .about-img-frame */
-
-    .about-corner {
-      position: absolute;
-      bottom: -20px; right: -20px;
-      width: 100px; height: 100px;
-      border: 1px solid var(--neon);
-      opacity: 0.4;
-    }
-    .about-stat-row {
-      display: flex;
-      gap: 40px;
-      margin-top: 48px;
-    }
-    .about-stat {
-      flex: 1;
-    }
-    .stat-num {
-      font-family: var(--font-display);
-      font-size: 3rem;
-      color: var(--neon);
-      line-height: 1;
-    }
-    .stat-label {
-      font-size: 0.6rem;
-      letter-spacing: 0.3em;
-      color: var(--muted);
-      text-transform: uppercase;
-      margin-top: 6px;
-    }
-    .about-text p {
-      color: var(--muted);
-      line-height: 1.8;
-      font-size: 0.85rem;
-      margin-bottom: 20px;
-    }
-    .about-text p strong { color: var(--text); }
-
-    /* GENRES */
-    .genre-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 32px;
-    }
-    .genre-tag {
-      font-size: 0.65rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      padding: 8px 18px;
-      border: 1px solid var(--border);
-      color: var(--muted);
-      transition: border-color 0.3s, color 0.3s;
-    }
-    .genre-tag:hover {
-      border-color: var(--neon);
-      color: var(--neon);
-    }
+    #about{background:var(--deep);display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;}
+    .about-img-wrap{position:relative;}
+    .about-img{aspect-ratio:3/4;background:linear-gradient(160deg,var(--surface) 0%,var(--card) 100%);clip-path:polygon(0 0,calc(100% - 28px) 0,100% 28px,100% 100%,28px 100%,0 calc(100% - 28px));overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;}
+    .about-img-lbl{font-family:var(--display);font-size:9rem;color:rgba(255,107,53,.08);letter-spacing:-.05em;user-select:none;}
+    .about-deco{position:absolute;bottom:-16px;right:-16px;width:80px;height:80px;border:1.5px solid var(--accent);opacity:.35;}
+    .about-text p{color:var(--sub);line-height:1.85;font-size:.9rem;margin-bottom:18px;}
+    .about-text strong{color:var(--text);font-weight:500;}
+    .tags{display:flex;flex-wrap:wrap;gap:8px;margin:24px 0 32px;}
+    .tag{font-family:var(--mono);font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;padding:7px 16px;border:1px solid var(--border);color:var(--sub);transition:border-color .25s,color .25s,background .25s;cursor:default;}
+    .tag:hover{border-color:var(--accent);color:var(--accent);background:rgba(255,107,53,.07);}
+    .tag.hl{border-color:var(--accent);color:var(--accent);background:rgba(255,107,53,.1);}
+    .academy-banner{background:linear-gradient(135deg,rgba(200,80,255,.12) 0%,rgba(0,212,170,.08) 100%);border:1px solid rgba(200,80,255,.3);padding:20px 24px;display:flex;align-items:center;gap:16px;margin-bottom:36px;}
+    .academy-icon{font-size:1.8rem;}
+    .academy-body strong{color:var(--text);font-size:.85rem;font-weight:500;display:block;margin-bottom:3px;}
+    .academy-body span{color:var(--sub);font-size:.75rem;}
+    .stat-row{display:flex;gap:32px;}
+    .stat{flex:1;border-left:2px solid var(--accent);padding-left:16px;}
+    .stat-n{font-family:var(--display);font-size:2.8rem;color:var(--text);line-height:1;}
+    .stat-l{font-family:var(--mono);font-size:.6rem;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-top:4px;}
 
     /* MIXES */
-    #mixes {
-      background: var(--black);
-    }
-    .mixes-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 2px;
-      margin-top: 0;
-    }
-    .mix-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      padding: 32px;
-      position: relative;
-      overflow: hidden;
-      transition: border-color 0.3s;
-      cursor: none;
-    }
-    .mix-card:hover { border-color: var(--neon); }
-    .mix-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(0,245,196,0.04) 0%, transparent 60%);
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-    .mix-card:hover::before { opacity: 1; }
-
-    .mix-num {
-      font-family: var(--font-display);
-      font-size: 4rem;
-      color: var(--border);
-      line-height: 1;
-      margin-bottom: 16px;
-    }
-    .mix-title {
-      font-family: var(--font-display);
-      font-size: 1.6rem;
-      letter-spacing: 0.05em;
-      margin-bottom: 8px;
-    }
-    .mix-meta {
-      font-size: 0.6rem;
-      letter-spacing: 0.3em;
-      color: var(--muted);
-      text-transform: uppercase;
-      margin-bottom: 24px;
-    }
-
-    .waveform {
-      display: flex;
-      align-items: flex-end;
-      gap: 3px;
-      height: 40px;
-      margin-bottom: 20px;
-    }
-    .waveform-bar {
-      flex: 1;
-      background: var(--border);
-      border-radius: 1px;
-      transition: background 0.3s;
-      animation: wavePulse var(--dur, 1s) ease-in-out infinite alternate;
-      animation-delay: var(--delay, 0s);
-    }
-    .mix-card:hover .waveform-bar { background: var(--neon); }
-
-    .mix-play {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 0.6rem;
-      letter-spacing: 0.3em;
-      color: var(--neon);
-      text-transform: uppercase;
-    }
-    .play-icon {
-      width: 32px; height: 32px;
-      border: 1px solid var(--neon);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.6rem;
-    }
+    #mixes{background:var(--bg);}
+    .mixes-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:52px;}
+    .mix-card{background:var(--surface);padding:32px;border:1px solid var(--border);position:relative;overflow:hidden;cursor:none;transition:border-color .3s,transform .2s;}
+    .mix-card:hover{border-color:var(--accent);transform:translateY(-3px);}
+    .mix-card::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,107,53,.06) 0%,transparent 60%);opacity:0;transition:opacity .3s;}
+    .mix-card:hover::after{opacity:1;}
+    .mix-n{font-family:var(--display);font-size:3.5rem;color:var(--border);line-height:1;margin-bottom:14px;}
+    .mix-title{font-family:var(--display);font-size:1.55rem;letter-spacing:.04em;margin-bottom:6px;}
+    .mix-meta{font-family:var(--mono);font-size:.58rem;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-bottom:22px;}
+    .waveform{display:flex;align-items:flex-end;gap:2.5px;height:38px;margin-bottom:20px;}
+    .wb{flex:1;background:var(--border);border-radius:1px;animation:wave var(--d,1s) ease-in-out infinite alternate;animation-delay:var(--dl,0s);transition:background .3s;}
+    .mix-card:hover .wb{background:var(--accent);}
+    @keyframes wave{from{transform:scaleY(.25)}to{transform:scaleY(1)}}
+    .mix-play{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:.58rem;letter-spacing:.2em;color:var(--accent);text-transform:uppercase;}
+    .play-btn{width:30px;height:30px;border:1.5px solid var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.55rem;}
 
     /* EVENTS */
-    #events {
-      background: var(--deep);
-    }
-    .events-list {
-      margin-top: 0;
-    }
-    .event-row {
-      display: grid;
-      grid-template-columns: 120px 1fr auto auto;
-      align-items: center;
-      gap: 32px;
-      padding: 28px 32px;
-      border-bottom: 1px solid var(--border);
-      transition: background 0.3s;
-      cursor: none;
-    }
-    .event-row:first-child { border-top: 1px solid var(--border); }
-    .event-row:hover { background: rgba(0,245,196,0.03); }
-    .event-row:hover .event-name { color: var(--neon); }
-
-    .event-date {
-      font-family: var(--font-display);
-      font-size: 2.2rem;
-      color: var(--neon);
-      line-height: 1;
-    }
-    .event-date-sub {
-      font-size: 0.55rem;
-      letter-spacing: 0.3em;
-      color: var(--muted);
-      text-transform: uppercase;
-    }
-    .event-name {
-      font-family: var(--font-display);
-      font-size: 1.8rem;
-      letter-spacing: 0.05em;
-      transition: color 0.3s;
-    }
-    .event-venue {
-      font-size: 0.65rem;
-      letter-spacing: 0.2em;
-      color: var(--muted);
-      text-transform: uppercase;
-      margin-top: 4px;
-    }
-    .event-city {
-      font-size: 0.65rem;
-      letter-spacing: 0.2em;
-      color: var(--muted);
-      text-transform: uppercase;
-      text-align: right;
-    }
-    .event-status {
-      font-size: 0.55rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      padding: 6px 14px;
-      border: 1px solid;
-    }
-    .status-soon { border-color: var(--neon3); color: var(--neon3); }
-    .status-avail { border-color: var(--neon); color: var(--neon); }
-    .status-sold { border-color: var(--muted); color: var(--muted); }
+    #events{background:var(--deep);}
+    .ev-row{display:grid;grid-template-columns:100px 1fr auto auto;align-items:center;gap:28px;padding:26px 28px;border-bottom:1px solid var(--border);cursor:none;transition:background .25s;}
+    .ev-row:first-of-type{border-top:1px solid var(--border);}
+    .ev-row:hover{background:rgba(255,107,53,.04);}
+    .ev-row:hover .ev-name{color:var(--accent);}
+    .ev-date{font-family:var(--display);font-size:2.2rem;color:var(--accent);line-height:1;}
+    .ev-dsub{font-family:var(--mono);font-size:.52rem;letter-spacing:.25em;color:var(--muted);text-transform:uppercase;}
+    .ev-name{font-family:var(--display);font-size:1.75rem;letter-spacing:.04em;transition:color .25s;}
+    .ev-venue{font-size:.68rem;color:var(--sub);margin-top:3px;}
+    .ev-city{font-family:var(--mono);font-size:.6rem;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;}
+    .ev-pill{font-family:var(--mono);font-size:.52rem;letter-spacing:.22em;text-transform:uppercase;padding:5px 13px;border:1px solid;}
+    .pill-hot{border-color:#ff6b35;color:#ff6b35;}
+    .pill-ok{border-color:var(--teal);color:var(--teal);}
 
     /* BOOKING */
-    #booking {
-      background: var(--black);
-      text-align: center;
-      padding: 160px 48px;
-      position: relative;
-      overflow: hidden;
-    }
-    #booking::before {
-      content: 'BOOK';
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      font-family: var(--font-display);
-      font-size: 40vw;
-      color: rgba(255,255,255,0.025);
-      pointer-events: none;
-      white-space: nowrap;
-    }
-    .booking-content {
-      position: relative;
-      z-index: 2;
-      max-width: 700px;
-      margin: 0 auto;
-    }
-    .booking-title {
-      font-family: var(--font-display);
-      font-size: clamp(4rem, 12vw, 11rem);
-      line-height: 0.88;
-      margin-bottom: 32px;
-    }
-    .booking-title em {
-      font-style: normal;
-      color: transparent;
-      -webkit-text-stroke: 1px rgba(0,232,184,0.7);
-    }
-    .booking-sub {
-      color: var(--muted);
-      font-size: 0.8rem;
-      line-height: 1.8;
-      margin-bottom: 48px;
-    }
-    .booking-socials {
-      display: flex;
-      gap: 24px;
-      justify-content: center;
-      margin-top: 64px;
-    }
-    .social-link {
-      width: 48px; height: 48px;
-      border: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 0.7rem;
-      letter-spacing: 0.1em;
-      transition: border-color 0.3s, color 0.3s;
-    }
-    .social-link:hover {
-      border-color: var(--neon);
-      color: var(--neon);
-    }
+    #booking{background:var(--bg);text-align:center;padding:160px 56px;position:relative;overflow:hidden;}
+    #booking::before{content:'BOOK';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--display);font-size:38vw;color:rgba(255,255,255,.02);pointer-events:none;white-space:nowrap;}
+    .booking-inner{position:relative;z-index:2;max-width:680px;margin:0 auto;}
+    .booking-title{font-family:var(--display);font-size:clamp(4rem,12vw,11rem);line-height:.88;margin-bottom:28px;}
+    .booking-title em{font-style:normal;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    .booking-sub{color:var(--sub);font-size:.85rem;line-height:1.8;margin-bottom:48px;}
+    .socials{display:flex;gap:12px;justify-content:center;margin-top:56px;}
+    .soc{width:46px;height:46px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted);text-decoration:none;font-family:var(--mono);font-size:.62rem;transition:border-color .25s,color .25s,background .25s;}
+    .soc:hover{border-color:var(--accent);color:var(--accent);background:rgba(255,107,53,.08);}
 
     /* MODAL */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(10,10,18,0.85);
-      backdrop-filter: blur(12px);
-      z-index: 800;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.35s ease;
-      padding: 24px;
-    }
-    .modal-overlay.open {
-      opacity: 1;
-      pointer-events: all;
-    }
-    .modal {
-      background: var(--deep);
-      border: 1px solid var(--border);
-      width: 100%;
-      max-width: 560px;
-      padding: 48px;
-      position: relative;
-      clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
-      transform: translateY(30px);
-      transition: transform 0.35s ease;
-    }
-    .modal-overlay.open .modal {
-      transform: translateY(0);
-    }
-    .modal-close {
-      position: absolute;
-      top: 20px; right: 20px;
-      background: none;
-      border: 1px solid var(--border);
-      color: var(--muted);
-      width: 36px; height: 36px;
-      font-size: 1rem;
-      cursor: none;
-      display: flex; align-items: center; justify-content: center;
-      transition: border-color 0.2s, color 0.2s;
-    }
-    .modal-close:hover { border-color: var(--neon3); color: var(--neon3); }
-
-    .modal-label {
-      font-size: 0.55rem;
-      letter-spacing: 0.5em;
-      color: var(--neon);
-      text-transform: uppercase;
-      margin-bottom: 12px;
-    }
-    .modal-title {
-      font-family: var(--font-display);
-      font-size: 2.8rem;
-      letter-spacing: 0.05em;
-      margin-bottom: 32px;
-      line-height: 1;
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-    }
-    .form-group label {
-      display: block;
-      font-size: 0.55rem;
-      letter-spacing: 0.35em;
-      color: var(--muted);
-      text-transform: uppercase;
-      margin-bottom: 8px;
-    }
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-      width: 100%;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--text);
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      padding: 13px 16px;
-      outline: none;
-      transition: border-color 0.3s;
-      appearance: none;
-    }
-    .form-group input:focus,
-    .form-group select:focus,
-    .form-group textarea:focus {
-      border-color: var(--neon);
-    }
-    .form-group textarea { resize: vertical; min-height: 100px; }
-    .form-group select option { background: var(--surface); }
-
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-
-    .form-submit {
-      width: 100%;
-      background: var(--neon);
-      color: var(--black);
-      border: none;
-      padding: 16px;
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
-      font-weight: 700;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      cursor: none;
-      margin-top: 8px;
-      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
-      transition: background 0.3s, transform 0.15s;
-    }
-    .form-submit:hover { background: #00d4a8; transform: translateY(-2px); }
-
-    .form-success {
-      display: none;
-      text-align: center;
-      padding: 32px 0;
-    }
-    .form-success .success-icon {
-      font-size: 3rem;
-      margin-bottom: 16px;
-    }
-    .form-success h3 {
-      font-family: var(--font-display);
-      font-size: 2rem;
-      margin-bottom: 12px;
-      color: var(--neon);
-    }
-    .form-success p {
-      color: var(--muted);
-      font-size: 0.75rem;
-      line-height: 1.7;
-    }
+    .overlay{position:fixed;inset:0;background:rgba(15,15,28,.88);backdrop-filter:blur(16px);z-index:800;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .3s;}
+    .overlay.open{opacity:1;pointer-events:all;}
+    .modal{background:var(--deep);border:1px solid var(--border);width:100%;max-width:580px;padding:52px;position:relative;clip-path:polygon(0 0,calc(100% - 22px) 0,100% 22px,100% 100%,22px 100%,0 calc(100% - 22px));transform:translateY(28px);transition:transform .3s;}
+    .overlay.open .modal{transform:translateY(0);}
+    .modal-x{position:absolute;top:20px;right:20px;background:none;border:1px solid var(--border);color:var(--muted);width:34px;height:34px;font-size:.9rem;cursor:none;display:flex;align-items:center;justify-content:center;transition:border-color .2s,color .2s;}
+    .modal-x:hover{border-color:#ff2d6b;color:#ff2d6b;}
+    .modal-lbl{font-family:var(--mono);font-size:.52rem;letter-spacing:.5em;color:var(--accent);text-transform:uppercase;margin-bottom:10px;}
+    .modal-h{font-family:var(--display);font-size:2.6rem;line-height:1;margin-bottom:32px;}
+    .fg{margin-bottom:18px;}
+    .fg label{display:block;font-family:var(--mono);font-size:.52rem;letter-spacing:.3em;color:var(--muted);text-transform:uppercase;margin-bottom:7px;}
+    .fg input,.fg select,.fg textarea{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--body);font-size:.82rem;padding:12px 15px;outline:none;transition:border-color .25s;}
+    .fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--accent);}
+    .fg textarea{resize:vertical;min-height:90px;}
+    .fg select option{background:var(--surface);}
+    .frow{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    .submit-btn{width:100%;background:linear-gradient(90deg,var(--accent),#e85c28);color:#fff;border:none;padding:16px;font-family:var(--mono);font-size:.68rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;cursor:none;margin-top:6px;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%);transition:opacity .25s,transform .15s;}
+    .submit-btn:hover{opacity:.88;transform:translateY(-2px);}
+    .success{display:none;text-align:center;padding:28px 0;}
+    .success-icon{font-size:3rem;margin-bottom:14px;}
+    .success h3{font-family:var(--display);font-size:2.2rem;color:var(--teal);margin-bottom:10px;}
+    .success p{color:var(--sub);font-size:.8rem;line-height:1.75;}
 
     /* FOOTER */
-    footer {
-      background: var(--deep);
-      border-top: 1px solid var(--border);
-      padding: 32px 48px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 0.6rem;
-      letter-spacing: 0.2em;
-      color: var(--muted);
-      text-transform: uppercase;
-    }
-    .footer-logo {
-      font-family: var(--font-display);
-      font-size: 1.5rem;
-      letter-spacing: 0.1em;
-      color: var(--neon);
-    }
+    footer{background:var(--deep);border-top:1px solid var(--border);padding:28px 56px;display:flex;align-items:center;justify-content:space-between;font-family:var(--mono);font-size:.58rem;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;}
+    .ft-logo{font-family:var(--display);font-size:1.6rem;color:var(--accent);letter-spacing:.1em;}
 
-    /* ANIMATIONS */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(40px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to   { opacity: 1; }
-    }
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to   { transform: rotate(360deg); }
-    }
-    @keyframes ticker {
-      from { transform: translateX(0); }
-      to   { transform: translateX(-50%); }
-    }
-    @keyframes wavePulse {
-      from { transform: scaleY(0.3); }
-      to   { transform: scaleY(1); }
-    }
+    /* REVEAL */
+    .reveal{opacity:0;transform:translateY(36px);transition:opacity .75s ease,transform .75s ease;}
+    .reveal.in{opacity:1;transform:translateY(0);}
 
-    /* Scroll reveal */
-    .reveal {
-      opacity: 0;
-      transform: translateY(40px);
-      transition: opacity 0.8s ease, transform 0.8s ease;
-    }
-    .reveal.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    @keyframes up{from{opacity:0;transform:translateY(38px)}to{opacity:1;transform:translateY(0)}}
 
-    /* Responsive */
-    @media (max-width: 1024px) {
-      #about { grid-template-columns: 1fr; }
-      .about-visual { display: none; }
-      .mixes-grid { grid-template-columns: 1fr 1fr; }
-      .vinyl-wrap { display: none; }
-    }
-    @media (max-width: 768px) {
-      nav { padding: 20px 24px; }
-      .nav-links { display: none; }
-      section { padding: 80px 24px; }
-      .mixes-grid { grid-template-columns: 1fr; }
-      .event-row { grid-template-columns: 80px 1fr; }
-      .event-city, .event-status { display: none; }
-      footer { flex-direction: column; gap: 16px; text-align: center; }
-    }
+    @media(max-width:1024px){#about{grid-template-columns:1fr;}.about-img-wrap{display:none;}.mixes-grid{grid-template-columns:1fr 1fr;}}
+    @media(max-width:768px){nav{padding:18px 20px;}.nav-links{display:none;}.section{padding:80px 20px;}.mixes-grid{grid-template-columns:1fr;}.ev-row{grid-template-columns:80px 1fr;}.ev-city,.ev-pill{display:none;}footer{flex-direction:column;gap:12px;text-align:center;}.modal{padding:32px 24px;}}
   </style>
 </head>
 <body>
 
-  <!-- Custom Cursor -->
-  <div class="cursor" id="cursor"></div>
-  <div class="cursor-ring" id="cursorRing"></div>
+<div id="cur"></div>
+<div id="curR"></div>
 
-  <!-- NAV -->
-  <nav id="nav">
-    <a href="#hero" class="nav-logo">DJASPER</a>
-    <ul class="nav-links">
-      <li><a href="#about">About</a></li>
-      <li><a href="#mixes">Mixes</a></li>
-      <li><a href="#events">Events</a></li>
-      <li><a href="#booking">Contact</a></li>
-    </ul>
-    <a href="mailto:booking@djasper.nl" class="nav-book">Book Now</a>
-  </nav>
+<!-- NAV -->
+<nav id="nav">
+  <a href="#hero" class="nav-logo">DJASPER</a>
+  <ul class="nav-links">
+    <li><a href="#about">Over</a></li>
+    <li><a href="#mixes">Mixes</a></li>
+    <li><a href="#events">Events</a></li>
+    <li><a href="#booking">Contact</a></li>
+  </ul>
+  <a href="#" class="nav-cta" id="navBook">Book Nu</a>
+</nav>
 
-  <!-- HERO -->
-  <section id="hero">
-    <div class="hero-bg"></div>
-    <div class="hero-grid"></div>
-
-    <div class="hero-content">
-      <div class="hero-tag">&#9632; Live — Amsterdam · Ibiza · Berlin</div>
-      <h1 class="hero-name">DJASPER</h1>
-      <p class="hero-sub">The Sound Architect &nbsp;·&nbsp; Techno &nbsp;·&nbsp; House &nbsp;·&nbsp; Electronic</p>
-      <div class="hero-cta">
-        <a href="#mixes" class="btn-primary">Listen Now</a>
-        <a href="#booking" class="btn-secondary">Book for Events</a>
-      </div>
-    </div>
-
-    <div class="vinyl-wrap">
-      <div class="vinyl"></div>
-    </div>
-  </section>
-
-  <!-- TICKER -->
-  <div class="ticker">
-    <div class="ticker-inner" id="tickerInner">
-      <span class="ticker-item">DJASPER <span class="ticker-sep">✦</span></span>
-      <span class="ticker-item">THE SOUND ARCHITECT <span class="ticker-sep">✦</span></span>
-      <span class="ticker-item">AMSTERDAM <span class="ticker-sep">✦</span></span>
-      <span class="ticker-item">TECHNO · HOUSE · ELECTRONIC <span class="ticker-sep">✦</span></span>
-      <span class="ticker-item">AVAILABLE FOR BOOKINGS <span class="ticker-sep">✦</span></span>
-      <span class="ticker-item">DJASPER <span class="ticker-sep">✦</span></span>
-      <span class="ticker-item">THE SOUND ARCHITECT <span class="ticker-sep">✦</span></span>
-      <span class="ticker-item">AMSTERDAM <span class="ticker-sep">✦</span></span>
-      <span class="ticker-item">TECHNO · HOUSE · ELECTRONIC <span class="ticker-sep">✦</span></span>
-      <span class="ticker-item">AVAILABLE FOR BOOKINGS <span class="ticker-sep">✦</span></span>
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+  <div class="hero-content">
+    <div class="hero-badge"><span class="bdot"></span>Hardstyle Producer &amp; DJ — Amsterdam</div>
+    <h1 class="hero-name">DJASPER</h1>
+    <p class="hero-sub">Hardstyle &nbsp;·&nbsp; Raw &nbsp;·&nbsp; Euphoric &nbsp;·&nbsp; Live Productie</p>
+    <div class="hero-cta">
+      <a href="#mixes" class="btn-fill">Luister Nu</a>
+      <a href="#" class="btn-outline" id="heroBook">Book voor Events</a>
     </div>
   </div>
+</section>
 
-  <!-- ABOUT -->
-  <section id="about">
-    <div class="about-visual">
-      <div class="about-img-frame">
-        <div class="about-img-placeholder">DJ</div>
-        <!-- Swap this div for: <img src="djasper-photo.jpg" style="width:100%;height:100%;object-fit:cover;"> -->
-      </div>
-      <div class="about-corner"></div>
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-track">
+    <span class="ticker-item">DJASPER <span class="tsep">✦</span></span>
+    <span class="ticker-item">HARDSTYLE PRODUCER <span class="tsep">✦</span></span>
+    <span class="ticker-item">AMSTERDAM <span class="tsep">✦</span></span>
+    <span class="ticker-item">VOLVER SOUND ACADEMY <span class="tsep">✦</span></span>
+    <span class="ticker-item">EIGEN PRODUCTIES <span class="tsep">✦</span></span>
+    <span class="ticker-item">LIVE SETS &amp; FESTIVALS <span class="tsep">✦</span></span>
+    <span class="ticker-item">DJASPER <span class="tsep">✦</span></span>
+    <span class="ticker-item">HARDSTYLE PRODUCER <span class="tsep">✦</span></span>
+    <span class="ticker-item">AMSTERDAM <span class="tsep">✦</span></span>
+    <span class="ticker-item">VOLVER SOUND ACADEMY <span class="tsep">✦</span></span>
+    <span class="ticker-item">EIGEN PRODUCTIES <span class="tsep">✦</span></span>
+    <span class="ticker-item">LIVE SETS &amp; FESTIVALS <span class="tsep">✦</span></span>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about" class="section">
+  <div class="about-img-wrap reveal">
+    <div class="about-img">
+      <div class="about-img-lbl">DJ</div>
+      <!-- Foto: voeg toe <img src="foto.jpg" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0"> -->
     </div>
-    <div class="about-text reveal">
-      <p class="section-label">// About</p>
-      <h2 class="section-title">Sound.<br>Story.<br>Energy.</h2>
-      <p>DJASPER is een <strong>Nederlandse DJ en producent</strong> die zijn publiek meeneemt op een sonische reis door techno, deep house en elektronische muziek. Met een scherp gevoel voor energie en timing weet hij elk podium te electrificeren.</p>
-      <p>Van intieme club-sets tot grote festivals — DJASPER levert altijd een <strong>onvergetelijke ervaring</strong>. Zijn sets zijn zorgvuldig opgebouwd, zijn energie is onuitputtelijk.</p>
+    <div class="about-deco"></div>
+  </div>
+  <div class="about-text reveal">
+    <p class="sec-label">// Over DJASPER</p>
+    <h2 class="sec-title" style="margin-bottom:28px">Geluid.<br>Kracht.<br>Passie.</h2>
+    <p>DJASPER is een <strong>Amsterdamse hardstyle DJ en producent</strong> die zich onderscheidt door zijn rauw, energetisch geluid en strakke eigen producties. Waar anderen draaien, bouwt hij — elke set is een combinatie van live productie en meeslepende energie.</p>
+    <p>Naast zijn optredens volgt hij momenteel een <strong>opleiding aan de Volver Sound Academy</strong>, waar hij zijn productietechnieken en sound design aanscherpt. Zijn muziek klinkt niet alleen — je <em>voelt</em> het.</p>
 
-      <div class="genre-tags">
-        <span class="genre-tag">Techno</span>
-        <span class="genre-tag">Deep House</span>
-        <span class="genre-tag">Melodic</span>
-        <span class="genre-tag">Afro House</span>
-        <span class="genre-tag">Industrial</span>
-        <span class="genre-tag">Electronic</span>
-      </div>
-
-      <div class="about-stat-row">
-        <div class="about-stat">
-          <div class="stat-num">200+</div>
-          <div class="stat-label">Shows per jaar</div>
-        </div>
-        <div class="about-stat">
-          <div class="stat-num">12</div>
-          <div class="stat-label">Landen</div>
-        </div>
-        <div class="about-stat">
-          <div class="stat-num">8</div>
-          <div class="stat-label">Jaar actief</div>
-        </div>
-      </div>
+    <div class="tags">
+      <span class="tag hl">Hardstyle</span>
+      <span class="tag hl">Raw Hardstyle</span>
+      <span class="tag">Euphoric</span>
+      <span class="tag">Hard Techno</span>
+      <span class="tag">Frenchcore</span>
+      <span class="tag">Eigen Producties</span>
     </div>
-  </section>
 
-  <!-- MIXES -->
-  <section id="mixes">
-    <div class="reveal">
-      <p class="section-label">// Latest Mixes</p>
-      <h2 class="section-title">Tune In.</h2>
-    </div>
-    <div class="mixes-grid">
-
-      <div class="mix-card reveal">
-        <div class="mix-num">01</div>
-        <div class="mix-title">DARK MATTER</div>
-        <div class="mix-meta">Techno · 90 min · 2025</div>
-        <div class="waveform" id="waveform1"></div>
-        <div class="mix-play">
-          <div class="play-icon">▶</div>
-          <span>Play on SoundCloud</span>
-        </div>
-      </div>
-
-      <div class="mix-card reveal" style="transition-delay:0.1s">
-        <div class="mix-num">02</div>
-        <div class="mix-title">SOLAR WINDS</div>
-        <div class="mix-meta">Melodic House · 75 min · 2025</div>
-        <div class="waveform" id="waveform2"></div>
-        <div class="mix-play">
-          <div class="play-icon">▶</div>
-          <span>Play on Mixcloud</span>
-        </div>
-      </div>
-
-      <div class="mix-card reveal" style="transition-delay:0.2s">
-        <div class="mix-num">03</div>
-        <div class="mix-title">AMSTERDAM LIVE</div>
-        <div class="mix-meta">Live Set · 120 min · 2024</div>
-        <div class="waveform" id="waveform3"></div>
-        <div class="mix-play">
-          <div class="play-icon">▶</div>
-          <span>Play on YouTube</span>
-        </div>
-      </div>
-
-      <div class="mix-card reveal" style="transition-delay:0.3s">
-        <div class="mix-num">04</div>
-        <div class="mix-title">NIGHT RITUAL</div>
-        <div class="mix-meta">Afro House · 60 min · 2024</div>
-        <div class="waveform" id="waveform4"></div>
-        <div class="mix-play">
-          <div class="play-icon">▶</div>
-          <span>Play on SoundCloud</span>
-        </div>
-      </div>
-
-      <div class="mix-card reveal" style="transition-delay:0.4s">
-        <div class="mix-num">05</div>
-        <div class="mix-title">IBIZA CLOSING</div>
-        <div class="mix-meta">Deep House · 110 min · 2024</div>
-        <div class="waveform" id="waveform5"></div>
-        <div class="mix-play">
-          <div class="play-icon">▶</div>
-          <span>Play on Mixcloud</span>
-        </div>
-      </div>
-
-      <div class="mix-card reveal" style="transition-delay:0.5s">
-        <div class="mix-num">06</div>
-        <div class="mix-title">DEBUT EP</div>
-        <div class="mix-meta">Studio · 42 min · 2023</div>
-        <div class="waveform" id="waveform6"></div>
-        <div class="mix-play">
-          <div class="play-icon">▶</div>
-          <span>Play on Spotify</span>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- EVENTS -->
-  <section id="events">
-    <div class="reveal">
-      <p class="section-label">// Upcoming Events</p>
-      <h2 class="section-title">On The Road.</h2>
-    </div>
-    <div class="events-list reveal">
-
-      <div class="event-row">
-        <div>
-          <div class="event-date">28</div>
-          <div class="event-date-sub">Mrt 2026</div>
-        </div>
-        <div>
-          <div class="event-name">SHELTER AMSTERDAM</div>
-          <div class="event-venue">Main Stage · B2B Set</div>
-        </div>
-        <div class="event-city">Amsterdam, NL</div>
-        <div class="event-status status-soon">Bijna Uitverkocht</div>
-      </div>
-
-      <div class="event-row">
-        <div>
-          <div class="event-date">12</div>
-          <div class="event-date-sub">Apr 2026</div>
-        </div>
-        <div>
-          <div class="event-name">AWAKENINGS FESTIVAL</div>
-          <div class="event-venue">Stage B · 04:00 – 06:00</div>
-        </div>
-        <div class="event-city">Amsterdam, NL</div>
-        <div class="event-status status-avail">Tickets Beschikbaar</div>
-      </div>
-
-      <div class="event-row">
-        <div>
-          <div class="event-date">03</div>
-          <div class="event-date-sub">Mei 2026</div>
-        </div>
-        <div>
-          <div class="event-name">DC-10 IBIZA</div>
-          <div class="event-venue">Closing Party · TBA</div>
-        </div>
-        <div class="event-city">Ibiza, ES</div>
-        <div class="event-status status-avail">Tickets Beschikbaar</div>
-      </div>
-
-      <div class="event-row">
-        <div>
-          <div class="event-date">21</div>
-          <div class="event-date-sub">Jun 2026</div>
-        </div>
-        <div>
-          <div class="event-name">TRESOR BERLIN</div>
-          <div class="event-venue">Globus · 02:00 – 06:00</div>
-        </div>
-        <div class="event-city">Berlin, DE</div>
-        <div class="event-status status-avail">Tickets Beschikbaar</div>
-      </div>
-
-      <div class="event-row">
-        <div>
-          <div class="event-date">19</div>
-          <div class="event-date-sub">Jul 2026</div>
-        </div>
-        <div>
-          <div class="event-name">DEKMANTEL FESTIVAL</div>
-          <div class="event-venue">UFO Stage</div>
-        </div>
-        <div class="event-city">Amsterdam, NL</div>
-        <div class="event-status status-avail">Tickets Beschikbaar</div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- BOOKING -->
-  <section id="booking">
-    <div class="booking-content reveal">
-      <p class="section-label">// Booking</p>
-      <h2 class="booking-title">Let's<br><em>Make</em><br>Noise.</h2>
-      <p class="booking-sub">
-        Voor bookings, samenwerkingen of meer informatie —<br>
-        vul het formulier in en we reageren binnen 48 uur.
-      </p>
-      <button class="btn-primary" onclick="openModal()" style="font-size:0.75rem;padding:18px 48px;">
-        Stuur een Bericht
-      </button>
-
-      <div class="booking-socials">
-        <a href="#" class="social-link" title="Instagram">IG</a>
-        <a href="#" class="social-link" title="SoundCloud">SC</a>
-        <a href="#" class="social-link" title="Mixcloud">MC</a>
-        <a href="#" class="social-link" title="Spotify">SP</a>
-        <a href="#" class="social-link" title="YouTube">YT</a>
-        <a href="#" class="social-link" title="Facebook">FB</a>
+    <div class="academy-banner">
+      <div class="academy-icon">🎓</div>
+      <div class="academy-body">
+        <strong>Volver Sound Academy</strong>
+        <span>Sound Design &amp; Muziekproductie — studie lopend</span>
       </div>
     </div>
-  </section>
 
-  <!-- CONTACT MODAL -->
-  <div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
-    <div class="modal" id="modal">
-      <button class="modal-close" onclick="closeModal()">✕</button>
-
-      <div id="formWrap">
-        <p class="modal-label">// Booking Request</p>
-        <h2 class="modal-title">LATEN WE<br>PRATEN.</h2>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="f-name">Naam</label>
-            <input type="text" id="f-name" placeholder="Jouw naam" />
-          </div>
-          <div class="form-group">
-            <label for="f-email">E-mail</label>
-            <input type="email" id="f-email" placeholder="jouw@email.nl" />
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="f-type">Type Event</label>
-            <select id="f-type">
-              <option value="">Selecteer type...</option>
-              <option>Club Night</option>
-              <option>Festival</option>
-              <option>Privé Feest</option>
-              <option>Corporate Event</option>
-              <option>B2B Set</option>
-              <option>Anders</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="f-date">Datum</label>
-            <input type="date" id="f-date" />
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="f-venue">Venue / Locatie</label>
-          <input type="text" id="f-venue" placeholder="Naam venue + stad" />
-        </div>
-
-        <div class="form-group">
-          <label for="f-msg">Bericht</label>
-          <textarea id="f-msg" placeholder="Vertel meer over jouw event, verwacht publiek, tijdslot..."></textarea>
-        </div>
-
-        <button class="form-submit" onclick="submitForm()">Verstuur Aanvraag →</button>
-      </div>
-
-      <div class="form-success" id="formSuccess">
-        <div class="success-icon">✦</div>
-        <h3>Ontvangen!</h3>
-        <p>Bedankt voor je bericht.<br>DJASPER of zijn management neemt binnen 48 uur contact met je op.</p>
-      </div>
+    <div class="stat-row">
+      <div class="stat"><div class="stat-n">150+</div><div class="stat-l">Shows</div></div>
+      <div class="stat"><div class="stat-n">8</div><div class="stat-l">Landen</div></div>
+      <div class="stat"><div class="stat-n">12+</div><div class="stat-l">Eigen Tracks</div></div>
     </div>
   </div>
+</section>
 
-  <!-- FOOTER -->
-  <footer>
-    <div class="footer-logo">DJASPER</div>
-    <div>© 2026 DJASPER — All Rights Reserved</div>
-    <div>Made with ♦ in Amsterdam</div>
-  </footer>
+<!-- MIXES -->
+<section id="mixes" class="section">
+  <div class="reveal">
+    <p class="sec-label">// Latest Mixes</p>
+    <h2 class="sec-title">Tune In.</h2>
+  </div>
+  <div class="mixes-grid">
+    <div class="mix-card reveal"><div class="mix-n">01</div><div class="mix-title">IRON FIST</div><div class="mix-meta">Raw Hardstyle · 90 min · 2025</div><div class="waveform" id="wf1"></div><div class="mix-play"><div class="play-btn">▶</div><span>SoundCloud</span></div></div>
+    <div class="mix-card reveal" style="transition-delay:.08s"><div class="mix-n">02</div><div class="mix-title">EUPHORIA</div><div class="mix-meta">Euphoric · 75 min · 2025</div><div class="waveform" id="wf2"></div><div class="mix-play"><div class="play-btn">▶</div><span>Mixcloud</span></div></div>
+    <div class="mix-card reveal" style="transition-delay:.16s"><div class="mix-n">03</div><div class="mix-title">AMSTERDAM LIVE</div><div class="mix-meta">Live Set · 120 min · 2024</div><div class="waveform" id="wf3"></div><div class="mix-play"><div class="play-btn">▶</div><span>YouTube</span></div></div>
+    <div class="mix-card reveal" style="transition-delay:.24s"><div class="mix-n">04</div><div class="mix-title">DEBUT EP</div><div class="mix-meta">Eigen Productie · 2024</div><div class="waveform" id="wf4"></div><div class="mix-play"><div class="play-btn">▶</div><span>Spotify</span></div></div>
+    <div class="mix-card reveal" style="transition-delay:.32s"><div class="mix-n">05</div><div class="mix-title">DEFQON.1 SET</div><div class="mix-meta">Festival · 60 min · 2024</div><div class="waveform" id="wf5"></div><div class="mix-play"><div class="play-btn">▶</div><span>SoundCloud</span></div></div>
+    <div class="mix-card reveal" style="transition-delay:.4s"><div class="mix-n">06</div><div class="mix-title">NOCTURNAL</div><div class="mix-meta">Hard Techno · 80 min · 2023</div><div class="waveform" id="wf6"></div><div class="mix-play"><div class="play-btn">▶</div><span>Mixcloud</span></div></div>
+  </div>
+</section>
 
-  <script>
-    // Cursor
-    const cursor = document.getElementById('cursor');
-    const ring = document.getElementById('cursorRing');
-    let mx = 0, my = 0, rx = 0, ry = 0;
-    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
-    function animCursor() {
-      cursor.style.left = mx + 'px';
-      cursor.style.top = my + 'px';
-      rx += (mx - rx) * 0.12;
-      ry += (my - ry) * 0.12;
-      ring.style.left = rx + 'px';
-      ring.style.top = ry + 'px';
-      requestAnimationFrame(animCursor);
-    }
-    animCursor();
-    document.querySelectorAll('a, button').forEach(el => {
-      el.addEventListener('mouseenter', () => {
-        cursor.style.width = '18px';
-        cursor.style.height = '18px';
-        ring.style.width = '54px';
-        ring.style.height = '54px';
-      });
-      el.addEventListener('mouseleave', () => {
-        cursor.style.width = '10px';
-        cursor.style.height = '10px';
-        ring.style.width = '36px';
-        ring.style.height = '36px';
-      });
-    });
+<!-- EVENTS -->
+<section id="events" class="section">
+  <div class="reveal">
+    <p class="sec-label">// Upcoming Events</p>
+    <h2 class="sec-title" style="margin-bottom:52px">On The Road.</h2>
+  </div>
+  <div class="reveal">
+    <div class="ev-row"><div><div class="ev-date">28</div><div class="ev-dsub">Mrt 2026</div></div><div><div class="ev-name">HARD BASS</div><div class="ev-venue">Stage 2 · B2B Set</div></div><div class="ev-city">Arnhem, NL</div><div class="ev-pill pill-hot">Bijna Vol</div></div>
+    <div class="ev-row"><div><div class="ev-date">18</div><div class="ev-dsub">Apr 2026</div></div><div><div class="ev-name">DEFQON.1</div><div class="ev-venue">Black Stage · 22:00</div></div><div class="ev-city">Biddinghuizen, NL</div><div class="ev-pill pill-ok">Beschikbaar</div></div>
+    <div class="ev-row"><div><div class="ev-date">09</div><div class="ev-dsub">Mei 2026</div></div><div><div class="ev-name">INTENTS FESTIVAL</div><div class="ev-venue">Main Stage · 01:00</div></div><div class="ev-city">Hilvarenbeek, NL</div><div class="ev-pill pill-ok">Beschikbaar</div></div>
+    <div class="ev-row"><div><div class="ev-date">27</div><div class="ev-dsub">Jun 2026</div></div><div><div class="ev-name">DOMINATOR</div><div class="ev-venue">Industrial Area · TBA</div></div><div class="ev-city">Eersel, NL</div><div class="ev-pill pill-ok">Beschikbaar</div></div>
+    <div class="ev-row"><div><div class="ev-date">08</div><div class="ev-dsub">Aug 2026</div></div><div><div class="ev-name">DECIBEL OUTDOOR</div><div class="ev-venue">Mainstage</div></div><div class="ev-city">Beekse Bergen, NL</div><div class="ev-pill pill-ok">Beschikbaar</div></div>
+  </div>
+</section>
 
-    // Scroll nav
-    const nav = document.getElementById('nav');
-    window.addEventListener('scroll', () => {
-      nav.classList.toggle('scrolled', window.scrollY > 60);
-    });
+<!-- BOOKING -->
+<section id="booking">
+  <div class="booking-inner reveal">
+    <p class="sec-label">// Booking</p>
+    <h2 class="booking-title">Let's<br><em>Make</em><br>Noise.</h2>
+    <p class="booking-sub">Voor bookings, samenwerkingen of meer informatie —<br>stuur een bericht en we reageren binnen 48 uur.</p>
+    <button class="btn-fill" id="bookBtn" style="font-size:.72rem;padding:17px 48px;">Stuur een Bericht</button>
+    <div class="socials">
+      <a href="#" class="soc" title="Instagram">IG</a>
+      <a href="#" class="soc" title="SoundCloud">SC</a>
+      <a href="#" class="soc" title="Mixcloud">MC</a>
+      <a href="#" class="soc" title="Spotify">SP</a>
+      <a href="#" class="soc" title="YouTube">YT</a>
+    </div>
+  </div>
+</section>
 
-    // Waveforms
-    function makeWaveform(id) {
-      const el = document.getElementById(id);
-      if (!el) return;
-      const count = 28;
-      for (let i = 0; i < count; i++) {
-        const bar = document.createElement('div');
-        bar.className = 'waveform-bar';
-        const h = Math.random() * 70 + 20;
-        bar.style.height = h + '%';
-        bar.style.setProperty('--dur', (0.6 + Math.random() * 0.8) + 's');
-        bar.style.setProperty('--delay', (Math.random() * 0.5) + 's');
-        el.appendChild(bar);
-      }
-    }
-    for (let i = 1; i <= 6; i++) makeWaveform('waveform' + i);
+<!-- MODAL -->
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <button class="modal-x" onclick="closeModal()">✕</button>
+    <div id="formWrap">
+      <p class="modal-lbl">// Booking Request</p>
+      <h2 class="modal-h">LATEN WE<br>PRATEN.</h2>
+      <div class="frow">
+        <div class="fg"><label>Naam</label><input id="fn" type="text" placeholder="Jouw naam"></div>
+        <div class="fg"><label>E-mail</label><input id="fe" type="email" placeholder="jouw@email.nl"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Type Event</label><select id="ft"><option value="">Selecteer...</option><option>Club Night / Rave</option><option>Hardstyle Festival</option><option>Privé Feest</option><option>B2B Set</option><option>Samenwerking / Collab</option><option>Anders</option></select></div>
+        <div class="fg"><label>Datum</label><input id="fd" type="date"></div>
+      </div>
+      <div class="fg"><label>Venue / Locatie</label><input id="fv" type="text" placeholder="Naam + stad"></div>
+      <div class="fg"><label>Bericht</label><textarea id="fm" placeholder="Vertel meer: publiek, tijdslot, capaciteit..."></textarea></div>
+      <button class="submit-btn" onclick="submitForm()">Verstuur Aanvraag →</button>
+    </div>
+    <div class="success" id="successMsg">
+      <div class="success-icon">✦</div>
+      <h3>Ontvangen!</h3>
+      <p>Bedankt voor je bericht.<br>DJASPER of zijn management neemt binnen 48 uur contact op.</p>
+    </div>
+  </div>
+</div>
 
-    // Modal
-    function openModal() {
-      document.getElementById('modalOverlay').classList.add('open');
-      document.body.style.overflow = 'hidden';
-    }
-    function closeModal() {
-      document.getElementById('modalOverlay').classList.remove('open');
-      document.body.style.overflow = '';
-    }
-    function handleOverlayClick(e) {
-      if (e.target === document.getElementById('modalOverlay')) closeModal();
-    }
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+<!-- FOOTER -->
+<footer>
+  <div class="ft-logo">DJASPER</div>
+  <div>© 2026 DJASPER — All Rights Reserved</div>
+  <div>Made with ♦ in Amsterdam</div>
+</footer>
 
-    function submitForm() {
-      const name = document.getElementById('f-name').value.trim();
-      const email = document.getElementById('f-email').value.trim();
-      if (!name || !email) {
-        document.getElementById('f-name').style.borderColor = name ? 'var(--border)' : 'var(--neon3)';
-        document.getElementById('f-email').style.borderColor = email ? 'var(--border)' : 'var(--neon3)';
-        return;
-      }
-      document.getElementById('formWrap').style.display = 'none';
-      document.getElementById('formSuccess').style.display = 'block';
-      setTimeout(closeModal, 3200);
-    }
+<script>
+  // Cursor
+  const cur=document.getElementById('cur'),curR=document.getElementById('curR');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+  (function loop(){cur.style.left=mx+'px';cur.style.top=my+'px';rx+=(mx-rx)*.13;ry+=(my-ry)*.13;curR.style.left=rx+'px';curR.style.top=ry+'px';requestAnimationFrame(loop);})();
+  document.querySelectorAll('a,button').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{cur.style.width='16px';cur.style.height='16px';curR.style.width='50px';curR.style.height='50px';});
+    el.addEventListener('mouseleave',()=>{cur.style.width='8px';cur.style.height='8px';curR.style.width='32px';curR.style.height='32px';});
+  });
 
-    // Also open modal from nav "Book Now"
-    document.querySelector('.nav-book').addEventListener('click', e => {
-      e.preventDefault(); openModal();
-    });
-    const reveals = document.querySelectorAll('.reveal');
-    const obs = new IntersectionObserver(entries => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          e.target.classList.add('visible');
-          obs.unobserve(e.target);
-        }
-      });
-    }, { threshold: 0.12 });
-    reveals.forEach(r => obs.observe(r));
-  </script>
+  // Nav scroll
+  window.addEventListener('scroll',()=>document.getElementById('nav').classList.toggle('scrolled',scrollY>60));
+
+  // Waveforms
+  [1,2,3,4,5,6].forEach(i=>{
+    const el=document.getElementById('wf'+i);
+    for(let j=0;j<26;j++){const b=document.createElement('div');b.className='wb';b.style.height=(Math.random()*65+22)+'%';b.style.setProperty('--d',(0.5+Math.random()*.9)+'s');b.style.setProperty('--dl',(Math.random()*.45)+'s');el.appendChild(b);}
+  });
+
+  // Reveal
+  const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');obs.unobserve(e.target);}}),{threshold:.1});
+  document.querySelectorAll('.reveal').forEach(r=>obs.observe(r));
+
+  // Modal
+  function openModal(){document.getElementById('overlay').classList.add('open');document.body.style.overflow='hidden';}
+  function closeModal(){document.getElementById('overlay').classList.remove('open');document.body.style.overflow='';setTimeout(()=>{document.getElementById('formWrap').style.display='block';document.getElementById('successMsg').style.display='none';},350);}
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+  function submitForm(){
+    const n=document.getElementById('fn').value.trim(),e=document.getElementById('fe').value.trim();
+    document.getElementById('fn').style.borderColor=n?'var(--border)':'var(--accent)';
+    document.getElementById('fe').style.borderColor=e?'var(--border)':'var(--accent)';
+    if(!n||!e)return;
+    document.getElementById('formWrap').style.display='none';
+    document.getElementById('successMsg').style.display='block';
+    setTimeout(closeModal,3000);
+  }
+  ['navBook','heroBook','bookBtn'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('click',e=>{e.preventDefault();openModal();});});
+</script>
 </body>
 </html>
